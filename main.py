@@ -2,33 +2,53 @@ from tkinter import *
 from math import *
 from colour import Color
 import random
+import math
+import time
 
 finestra = Tk()
 finestra.geometry("600x600")
 finestra.title("BoaringProject")
-canvas = Canvas(finestra, width= 650, height= 600, bg="black")
+canvas = Canvas(finestra, width= 600, height= 600, bg="black")
 canvas.pack()
-red = Color("green")
-colors = list(red.range_to(Color("violet"), 10000))
+green = Color("green")
+
 color= 0
 
+prob = 6 # prob to generate recursive: 0 => 0%, 10 => 100%
+length = 30.0 # length of first line
+nMax = 40 # max recursive level
 
-def genera_albero(cavanas, x1, y1, x2, y2, node, angleX,angleY, leng):
-    if node ==0:
+colors = list(green.range_to('violet', nMax + 1))
+
+def binary_prob_tree(x1, y1, level):
+    nRand = random.randint(1, 10)
+
+    if nRand > prob or level > nMax:
         return 0
-    global color
     
-    width =  (y2/100)
-    color = color+1
-    linea = cavanas.create_line(x1, y1, x2, y2, fill=colors[color], width= width)
+    partial_length = length - level * 0.8
+
+    x2_p1 = x1 - 1/2*length
+    y2_p1 = y1 - 1/2*length
+
+    x2_p2 = x1 + 1/2*length
+    y2_p2 = y1 - 1/2*length
+    
+    """
+    create 2 new smaller lines, on direction top left and top right 
+    from the given x1 and x2
+    """
+    canvas.create_line(x1, y1, x2_p1, y2_p1, fill=colors[level], width= 3)
+    canvas.create_line(x1, y1, x2_p2, y2_p2, fill=colors[level], width= 3)
 
     finestra.update()
-    
-    ramoX = leng * cos(angleX)
-    ramoY = leng  * abs(sin(angleY))
 
-    genera_albero(cavanas, x2, y2, (x2 + ramoX) , (y2 - ramoY- 10), node-1, angleX - 0.97,  angleY -0.17, leng*0.83)
-    genera_albero(cavanas, x2, y2, (x2 - ramoX) , (y2 - ramoY- 5), node-1, -angleX- 0.17, - angleY+ 0.47, leng*0.83)
+    binary_prob_tree(x2_p1, y2_p1, level+1)
+    binary_prob_tree(x2_p2, y2_p2, level+1)
 
-genera_albero(canvas, 325, 600, 325, 450, 13, 0.5, 1, 70)
+
+canvas.create_line(300, 600, 300, 570, fill=colors[1], width= 5)
+binary_prob_tree(300, 570, 1)
+
+
 finestra.mainloop()
